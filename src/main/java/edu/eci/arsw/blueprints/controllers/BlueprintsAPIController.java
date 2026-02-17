@@ -14,21 +14,40 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * REST controller for managing blueprint resources.
+ * Exposes HTTP endpoints for retrieving, creating, and updating blueprints.
+ * Delegates business logic to the BlueprintsServices class.
+ */
 @RestController
 @RequestMapping("/blueprints")
 public class BlueprintsAPIController {
 
+    /**
+     * Service layer for blueprint operations.
+     */
     private final BlueprintsServices services;
 
+    /**
+     * Constructs the controller with the required service dependency.
+     * @param services The BlueprintsServices instance
+     */
     public BlueprintsAPIController(BlueprintsServices services) { this.services = services; }
 
-    // GET /blueprints
+    /**
+     * Retrieves all blueprints in the system.
+     * @return HTTP 200 with the set of all blueprints
+     */
     @GetMapping
     public ResponseEntity<Set<Blueprint>> getAll() {
         return ResponseEntity.ok(services.getAllBlueprints());
     }
 
-    // GET /blueprints/{author}
+    /**
+     * Retrieves all blueprints created by a specific author.
+     * @param author The author's name
+     * @return HTTP 200 with the set of blueprints, or 404 if none found
+     */
     @GetMapping("/{author}")
     public ResponseEntity<?> byAuthor(@PathVariable String author) {
         try {
@@ -38,7 +57,12 @@ public class BlueprintsAPIController {
         }
     }
 
-    // GET /blueprints/{author}/{bpname}
+    /**
+     * Retrieves a specific blueprint by author and blueprint name.
+     * @param author The author's name
+     * @param bpname The blueprint's name
+     * @return HTTP 200 with the blueprint, or 404 if not found
+     */
     @GetMapping("/{author}/{bpname}")
     public ResponseEntity<?> byAuthorAndName(@PathVariable String author, @PathVariable String bpname) {
         try {
@@ -48,7 +72,11 @@ public class BlueprintsAPIController {
         }
     }
 
-    // POST /blueprints
+    /**
+     * Creates a new blueprint with the provided data.
+     * @param req The request body containing author, name, and points
+     * @return HTTP 201 if created, or 403 if a blueprint with the same key already exists
+     */
     @PostMapping
     public ResponseEntity<?> add(@Valid @RequestBody NewBlueprintRequest req) {
         try {
@@ -60,7 +88,13 @@ public class BlueprintsAPIController {
         }
     }
 
-    // PUT /blueprints/{author}/{bpname}/points
+    /**
+     * Adds a new point to an existing blueprint.
+     * @param author The author's name
+     * @param bpname The blueprint's name
+     * @param p The point to add
+     * @return HTTP 202 if accepted, or 404 if the blueprint is not found
+     */
     @PutMapping("/{author}/{bpname}/points")
     public ResponseEntity<?> addPoint(@PathVariable String author, @PathVariable String bpname,
                                       @RequestBody Point p) {
@@ -72,6 +106,10 @@ public class BlueprintsAPIController {
         }
     }
 
+    /**
+     * Request body model for creating a new blueprint.
+     * Encapsulates and validates the required fields: author, name, and points.
+     */
     public record NewBlueprintRequest(
             @NotBlank String author,
             @NotBlank String name,
