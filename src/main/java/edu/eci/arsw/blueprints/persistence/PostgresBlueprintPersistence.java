@@ -2,7 +2,7 @@ package edu.eci.arsw.blueprints.persistence;
 
 import edu.eci.arsw.blueprints.model.Blueprint;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -14,6 +14,7 @@ import java.util.List;
  * PostgreSQL implementation of BlueprintPersistence using Spring Data JPA.
  * Replaces the in-memory version and persists blueprints in the database.
  */
+@Primary
 @Repository
 public class PostgresBlueprintPersistence implements BlueprintPersistence {
 
