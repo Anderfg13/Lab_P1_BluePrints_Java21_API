@@ -1,4 +1,5 @@
 package edu.eci.arsw.blueprints.model;
+import jakarta.persistence.Embeddable;
 
 /**
  * Represents a point in a 2D coordinate system.
@@ -8,4 +9,5 @@ package edu.eci.arsw.blueprints.model;
  * @param x The x-coordinate of the point
  * @param y The y-coordinate of the point
  */
+@Embeddable
 public record Point(int x, int y) { }
