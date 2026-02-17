@@ -1,0 +1,70 @@
+package edu.eci.arsw.blueprints.persistence;
+
+import edu.eci.arsw.blueprints.model.Blueprint;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.List;
+
+/**
+ * PostgreSQL implementation of BlueprintPersistence using Spring Data JPA.
+ * Replaces the in-memory version and persists blueprints in the database.
+ */
+@Repository
+public class PostgresBlueprintPersistence implements BlueprintPersistence {
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Override
+    public void saveBlueprint(Blueprint bp) throws BlueprintPersistenceException {
+        try {
+            entityManager.persist(bp);
+        } catch (Exception e) {
+            throw new BlueprintPersistenceException("Error saving blueprint: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Blueprint getBlueprint(String author, String name) throws BlueprintNotFoundException {
+        TypedQuery<Blueprint> query = entityManager.createQuery(
+            "SELECT b FROM Blueprint b WHERE b.author = :author AND b.name = :name", Blueprint.class);
+        query.setParameter("author", author);
+        query.setParameter("name", name);
+        List<Blueprint> result = query.getResultList();
+        if (result.isEmpty()) {
+            throw new BlueprintNotFoundException("Blueprint not found: " + author + "/" + name);
+        }
+        return result.get(0);
+    }
+
+    @Override
+    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
+        TypedQuery<Blueprint> query = entityManager.createQuery(
+            "SELECT b FROM Blueprint b WHERE b.author = :author", Blueprint.class);
+        query.setParameter("author", author);
+        List<Blueprint> result = query.getResultList();
+        if (result.isEmpty()) {
+            throw new BlueprintNotFoundException("No blueprints for author: " + author);
+        }
+        return new HashSet<>(result);
+    }
+
+    @Override
+    public Set<Blueprint> getAllBlueprints() {
+        TypedQuery<Blueprint> query = entityManager.createQuery(
+            "SELECT b FROM Blueprint b", Blueprint.class);
+        return new HashSet<>(query.getResultList());
+    }
+
+    @Override
+    public void addPoint(String author, String name, int x, int y) throws BlueprintNotFoundException {
+        Blueprint bp = getBlueprint(author, name);
+        bp.addPoint(new edu.eci.arsw.blueprints.model.Point(x, y));
+        entityManager.merge(bp);
+    }
+}

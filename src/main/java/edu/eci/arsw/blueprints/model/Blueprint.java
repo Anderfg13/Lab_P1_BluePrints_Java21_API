@@ -1,5 +1,6 @@
 package edu.eci.arsw.blueprints.model;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,12 +9,42 @@ import java.util.Objects;
 /**
  * Represents a blueprint composed of an author, a name, and a list of points.
  * Allows access and modification of blueprint data, as well as comparison by author and name.
+ * This class is mapped as a JPA entity for database persistence.
  */
+@Entity
+@Table(name = "blueprints")
 public class Blueprint {
 
+    /**
+     * Primary key for the blueprint entity.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * Name of the blueprint's author.
+     */
+    @Column(nullable = false)
     private String author;
+
+    /**
+     * Name of the blueprint.
+     */
+    @Column(nullable = false)
     private String name;
-    private final List<Point> points = new ArrayList<>();
+
+    /**
+     * List of points that make up the blueprint.
+     * Stored as an element collection in the database.
+     */
+    @ElementCollection
+    private List<Point> points = new ArrayList<>();
+
+    /**
+     * Default constructor required by JPA.
+     */
+    public Blueprint() {}
 
     /**
      * Creates a new blueprint with the specified author, name, and list of points.
@@ -26,6 +57,12 @@ public class Blueprint {
         this.name = name;
         if (pts != null) points.addAll(pts);
     }
+
+    /**
+     * Gets the primary key of the blueprint.
+     * @return Blueprint id
+     */
+    public Long getId() { return id; }
 
     /**
      * Gets the name of the blueprint's author.
