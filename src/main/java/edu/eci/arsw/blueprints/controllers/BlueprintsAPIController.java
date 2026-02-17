@@ -40,7 +40,7 @@ public class BlueprintsAPIController {
      */
     @GetMapping
     public ResponseEntity<Set<Blueprint>> getAll() {
-        return ResponseEntity.ok(services.getAllBlueprints());
+        return ResponseEntity.ok(services.getAllBlueprints()); // 200 OK
     }
 
     /**
@@ -51,9 +51,9 @@ public class BlueprintsAPIController {
     @GetMapping("/{author}")
     public ResponseEntity<?> byAuthor(@PathVariable String author) {
         try {
-            return ResponseEntity.ok(services.getBlueprintsByAuthor(author));
+            return ResponseEntity.ok(services.getBlueprintsByAuthor(author)); // 200 OK
         } catch (BlueprintNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage())); // 404 Not Found
         }
     }
 
@@ -66,9 +66,9 @@ public class BlueprintsAPIController {
     @GetMapping("/{author}/{bpname}")
     public ResponseEntity<?> byAuthorAndName(@PathVariable String author, @PathVariable String bpname) {
         try {
-            return ResponseEntity.ok(services.getBlueprint(author, bpname));
+            return ResponseEntity.ok(services.getBlueprint(author, bpname)); // 200 OK
         } catch (BlueprintNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage())); // 404 Not Found
         }
     }
 
@@ -82,9 +82,9 @@ public class BlueprintsAPIController {
         try {
             Blueprint bp = new Blueprint(req.author(), req.name(), req.points());
             services.addNewBlueprint(bp);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created
         } catch (BlueprintPersistenceException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage())); // 400 Bad Request
         }
     }
 
@@ -100,9 +100,9 @@ public class BlueprintsAPIController {
                                       @RequestBody Point p) {
         try {
             services.addPoint(author, bpname, p.x(), p.y());
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build(); // 202 Accepted
         } catch (BlueprintNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage())); // 404 Not Found
         }
     }
 
