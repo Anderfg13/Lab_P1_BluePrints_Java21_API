@@ -20,7 +20,7 @@ import java.util.Set;
  * Delegates business logic to the BlueprintsServices class.
  */
 @RestController
-@RequestMapping("/blueprints")
+@RequestMapping("/api/v1/blueprints")
 public class BlueprintsAPIController {
 
     /**
