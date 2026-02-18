@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +41,20 @@ public class BlueprintsAPIController {
      * Retrieves all blueprints in the system.
      * @return HTTP 200 with the set of all blueprints
      */
+    @Operation(summary = "Obtener todos los blueprints")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Lista de blueprints obtenida exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "404",
+            description = "No se encontraron blueprints",
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"code\":404,\"message\":\"No se encontraron blueprints\",\"data\":null}"
+                )
+            )
+        )
+    })
     @GetMapping
     public ResponseEntity<ApiResponse<Set<Blueprint>>> getAll() {
         Set<Blueprint> data = services.getAllBlueprints();
@@ -50,6 +66,20 @@ public class BlueprintsAPIController {
      * @param author The author's name
      * @return HTTP 200 with the set of blueprints, or 404 if none found
      */
+    @Operation(summary = "Obtener todos los blueprints de un autor")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Lista de blueprints del autor obtenida exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "404",
+            description = "No se encontraron blueprints para el autor",
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"code\":404,\"message\":\"No se encontraron blueprints para el autor\",\"data\":null}"
+                )
+            )
+        )
+    })
     @GetMapping("/{author}")
     public ResponseEntity<ApiResponse<Set<Blueprint>>> byAuthor(@PathVariable String author) {
         try {
@@ -67,6 +97,20 @@ public class BlueprintsAPIController {
      * @param bpname The blueprint's name
      * @return HTTP 200 with the blueprint, or 404 if not found
      */
+    @Operation(summary = "Obtener un blueprint por autor y nombre")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Blueprint obtenido exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "404",
+            description = "Blueprint no encontrado",
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"code\":404,\"message\":\"Blueprint no encontrado\",\"data\":null}"
+                )
+            )
+        )
+    })
     @GetMapping("/{author}/{bpname}")
     public ResponseEntity<ApiResponse<Blueprint>> byAuthorAndName(@PathVariable String author, @PathVariable String bpname) {
         try {
@@ -83,6 +127,30 @@ public class BlueprintsAPIController {
      * @param req The request body containing author, name, and points
      * @return HTTP 201 if created, or 403 if a blueprint with the same key already exists
      */
+    @Operation(summary = "Agregar un nuevo blueprint")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Blueprint creado exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "Solicitud inválida o datos incorrectos",
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"code\":400,\"message\":\"Solicitud inválida o datos incorrectos\",\"data\":null}"
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "409",
+            description = "El blueprint ya existe",
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"code\":409,\"message\":\"El blueprint ya existe\",\"data\":null}"
+                )
+            )
+        )
+    })
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> add(@Valid @RequestBody NewBlueprintRequest req) {
         try {
@@ -103,6 +171,30 @@ public class BlueprintsAPIController {
      * @param p The point to add
      * @return HTTP 202 if accepted, or 404 if the blueprint is not found
      */
+    @Operation(summary = "Agregar un punto a un blueprint existente")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description = "Punto agregado exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "404",
+            description = "Blueprint no encontrado",
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"code\":404,\"message\":\"Blueprint no encontrado\",\"data\":null}"
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "Solicitud inválida o datos incorrectos",
+            content = @io.swagger.v3.oas.annotations.media.Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"code\":400,\"message\":\"Solicitud inválida o datos incorrectos\",\"data\":null}"
+                )
+            )
+        )
+    })
     @PutMapping("/{author}/{bpname}/points")
     public ResponseEntity<ApiResponse<Void>> addPoint(@PathVariable String author, @PathVariable String bpname,
                                       @RequestBody Point p) {
