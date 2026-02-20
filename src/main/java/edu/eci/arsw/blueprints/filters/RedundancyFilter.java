@@ -9,24 +9,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Elimina puntos consecutivos duplicados (x,y) para reducir redundancia.
- * Perfil: "redundancy"
+ * RedundancyFilter: removes consecutive duplicate points.
+ * If there are two or more equal consecutive points, only keeps the first one.
+ * Profile: "redundancy"
  */
 @Component
 @Profile("redundancy")
 public class RedundancyFilter implements BlueprintsFilter {
+    
     @Override
     public Blueprint apply(Blueprint bp) {
-        List<Point> in = bp.getPoints();
-        if (in.isEmpty()) return bp;
-        List<Point> out = new ArrayList<>();
-        Point prev = null;
-        for (Point p : in) {
-            if (prev == null || !(prev.x()==p.x() && prev.y()==p.y())) {
-                out.add(p);
-                prev = p;
-            }
+        List<Point> originalPoints = bp.getPoints();
+        
+        // If there are 0 or 1 points, there's nothing to filter
+        if (originalPoints == null || originalPoints.size() <= 1) {
+            return bp;
         }
-        return new Blueprint(bp.getAuthor(), bp.getName(), out);
+        
+        List<Point> filteredPoints = new ArrayList<>();
+        
+        // Always add the first point
+        Point previousPoint = originalPoints.get(0);
+        filteredPoints.add(previousPoint);
+        
+        // Iterate from the second point onwards
+        for (int i = 1; i < originalPoints.size(); i++) {
+            Point currentPoint = originalPoints.get(i);
+            
+            // Only add the point if it's different from the previous one
+            if (!currentPoint.equals(previousPoint)) {
+                filteredPoints.add(currentPoint);
+                previousPoint = currentPoint;
+            }
+            // If it's the same, we skip it (don't add it)
+        }
+        
+        return new Blueprint(bp.getAuthor(), bp.getName(), filteredPoints);
     }
 }
