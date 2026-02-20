@@ -1,10 +1,18 @@
+error id: file:///D:/ander/Documents/SEMESTRE%207/ARSW/LAB04%20-%20P1%20-%20BLUEPRINTS/Lab_P1_BluePrints_Java21_API/src/main/java/edu/eci/arsw/blueprints/controllers/BlueprintsAPIController.java:edu/eci/arsw/blueprints/model/Point#
+file:///D:/ander/Documents/SEMESTRE%207/ARSW/LAB04%20-%20P1%20-%20BLUEPRINTS/Lab_P1_BluePrints_Java21_API/src/main/java/edu/eci/arsw/blueprints/controllers/BlueprintsAPIController.java
+empty definition using pc, found symbol in pc: edu/eci/arsw/blueprints/model/Point#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 134
+uri: file:///D:/ander/Documents/SEMESTRE%207/ARSW/LAB04%20-%20P1%20-%20BLUEPRINTS/Lab_P1_BluePrints_Java21_API/src/main/java/edu/eci/arsw/blueprints/controllers/BlueprintsAPIController.java
+text:
+```scala
 package edu.eci.arsw.blueprints.controllers;
 
 import edu.eci.arsw.blueprints.model.Blueprint;
-import edu.eci.arsw.blueprints.model.Point;
-import edu.eci.arsw.blueprints.dto.BlueprintDTO;
-import edu.eci.arsw.blueprints.dto.PointDTO;
-import edu.eci.arsw.blueprints.dto.BlueprintMapper;
+import edu.eci.arsw.blueprints.model.@@Point;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
 import edu.eci.arsw.blueprints.services.BlueprintsServices;
@@ -15,10 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
-import java.util.Map;
 import java.util.Set;
-import edu.eci.arsw.blueprints.controllers.ApiResponse;
 
 /**
  * REST controller for managing blueprint resources.
@@ -59,10 +64,9 @@ public class BlueprintsAPIController {
         )
     })
     @GetMapping
-    public ResponseEntity<ApiResponse<Set<BlueprintDTO>>> getAll() {
+    public ResponseEntity<ApiResponse<Set<Blueprint>>> getAll() {
         Set<Blueprint> data = services.getAllBlueprints();
-        Set<BlueprintDTO> dtoSet = data.stream().map(BlueprintMapper::toDTO).collect(java.util.stream.Collectors.toSet());
-        return ResponseEntity.ok(new ApiResponse<>(200, "Success", dtoSet)); // 200 OK
+        return ResponseEntity.ok(new ApiResponse<>(200, "Success", data)); // 200 OK
     }
 
     /**
@@ -85,11 +89,10 @@ public class BlueprintsAPIController {
         )
     })
     @GetMapping("/{author}")
-    public ResponseEntity<ApiResponse<Set<BlueprintDTO>>> byAuthor(@PathVariable String author) {
+    public ResponseEntity<ApiResponse<Set<Blueprint>>> byAuthor(@PathVariable String author) {
         try {
             Set<Blueprint> data = services.getBlueprintsByAuthor(author);
-            Set<BlueprintDTO> dtoSet = data.stream().map(BlueprintMapper::toDTO).collect(java.util.stream.Collectors.toSet());
-            return ResponseEntity.ok(new ApiResponse<>(200, "Success", dtoSet)); // 200 OK
+            return ResponseEntity.ok(new ApiResponse<>(200, "Success", data)); // 200 OK
         } catch (BlueprintNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>(404, e.getMessage(), null)); // 404 Not Found
@@ -117,11 +120,10 @@ public class BlueprintsAPIController {
         )
     })
     @GetMapping("/{author}/{bpname}")
-    public ResponseEntity<ApiResponse<BlueprintDTO>> byAuthorAndName(@PathVariable String author, @PathVariable String bpname) {
+    public ResponseEntity<ApiResponse<Blueprint>> byAuthorAndName(@PathVariable String author, @PathVariable String bpname) {
         try {
             Blueprint data = services.getBlueprint(author, bpname);
-            BlueprintDTO dto = BlueprintMapper.toDTO(data);
-            return ResponseEntity.ok(new ApiResponse<>(200, "Success", dto)); // 200 OK
+            return ResponseEntity.ok(new ApiResponse<>(200, "Success", data)); // 200 OK
         } catch (BlueprintNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>(404, e.getMessage(), null)); // 404 Not Found
@@ -160,9 +162,7 @@ public class BlueprintsAPIController {
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> add(@Valid @RequestBody NewBlueprintRequest req) {
         try {
-            // Convertir los PointDTO a Point
-            java.util.List<Point> points = req.points().stream().map(BlueprintMapper::toEntity).toList();
-            Blueprint bp = new Blueprint(req.author(), req.name(), points);
+            Blueprint bp = new Blueprint(req.author(), req.name(), req.points());
             services.addNewBlueprint(bp);
             return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(201, "Created", null)); // 201 Created
@@ -205,11 +205,11 @@ public class BlueprintsAPIController {
     })
     @PutMapping("/{author}/{bpname}/points")
     public ResponseEntity<ApiResponse<Void>> addPoint(@PathVariable String author, @PathVariable String bpname,
-                                      @RequestBody PointDTO p) {
+                                      @RequestBody Point p) {
         try {
-            services.addPoint(author, bpname, p.getX(), p.getY());
-            return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(201, "Created", null)); // 201 Created
+            services.addPoint(author, bpname, p.x(), p.y());
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(new ApiResponse<>(202, "Accepted", null)); // 202 Accepted
         } catch (BlueprintNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>(404, e.getMessage(), null)); // 404 Not Found
@@ -220,9 +220,16 @@ public class BlueprintsAPIController {
      * Request body model for creating a new blueprint.
      * Encapsulates and validates the required fields: author, name, and points.
      */
-        public record NewBlueprintRequest(
+    public record NewBlueprintRequest(
             @NotBlank String author,
             @NotBlank String name,
-            @Valid java.util.List<PointDTO> points
-        ) { }
+            @Valid java.util.List<Point> points
+    ) { }
 }
+
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: edu/eci/arsw/blueprints/model/Point#

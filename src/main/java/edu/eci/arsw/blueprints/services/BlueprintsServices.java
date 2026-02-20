@@ -53,6 +53,7 @@ public class BlueprintsServices {
      * @return A set of all blueprints
      */
     public Set<Blueprint> getAllBlueprints() {
+        // Mantener retorno de entidades, el mapeo a DTO se hace en el controlador
         return persistence.getAllBlueprints();
     }
 
@@ -63,6 +64,7 @@ public class BlueprintsServices {
      * @throws BlueprintNotFoundException if no blueprints are found for the author
      */
     public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
+        // Mantener retorno de entidades, el mapeo a DTO se hace en el controlador
         return persistence.getBlueprintsByAuthor(author);
     }
 
@@ -74,6 +76,7 @@ public class BlueprintsServices {
      * @throws BlueprintNotFoundException if the blueprint is not found
      */
     public Blueprint getBlueprint(String author, String name) throws BlueprintNotFoundException {
+        // Mantener retorno de entidad, el mapeo a DTO se hace en el controlador
         return filter.apply(persistence.getBlueprint(author, name));
     }
 

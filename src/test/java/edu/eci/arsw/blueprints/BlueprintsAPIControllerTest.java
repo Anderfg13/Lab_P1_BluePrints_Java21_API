@@ -3,6 +3,9 @@ package edu.eci.arsw.blueprints;
 
 import edu.eci.arsw.blueprints.model.Blueprint;
 import edu.eci.arsw.blueprints.model.Point;
+import edu.eci.arsw.blueprints.dto.BlueprintDTO;
+import edu.eci.arsw.blueprints.dto.PointDTO;
+import edu.eci.arsw.blueprints.dto.BlueprintMapper;
 import edu.eci.arsw.blueprints.controllers.*;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
@@ -45,14 +48,22 @@ class BlueprintsAPIControllerTest {
     private Point samplePoint1;
     private Point samplePoint2;
     private Set<Blueprint> sampleBlueprintSet;
+    private BlueprintDTO sampleBlueprintDTO;
+    private PointDTO samplePointDTO1;
+    private PointDTO samplePointDTO2;
+    private Set<BlueprintDTO> sampleBlueprintDTOSet;
 
     @BeforeEach
     void setUp() {
         samplePoint1 = new Point(10, 20);
         samplePoint2 = new Point(30, 40);
-        sampleBlueprint = new Blueprint("author1", "blueprint1", 
-                                      Arrays.asList(samplePoint1, samplePoint2));
+        sampleBlueprint = new Blueprint("author1", "blueprint1", Arrays.asList(samplePoint1, samplePoint2));
         sampleBlueprintSet = new HashSet<>(Arrays.asList(sampleBlueprint));
+        // DTOs
+        samplePointDTO1 = new PointDTO(10, 20);
+        samplePointDTO2 = new PointDTO(30, 40);
+        sampleBlueprintDTO = new BlueprintDTO(null, "author1", "blueprint1", Arrays.asList(samplePointDTO1, samplePointDTO2));
+        sampleBlueprintDTOSet = new HashSet<>(Arrays.asList(sampleBlueprintDTO));
     }
 
     @Nested
@@ -66,7 +77,7 @@ class BlueprintsAPIControllerTest {
             when(services.getAllBlueprints()).thenReturn(sampleBlueprintSet);
 
             // Act
-            ResponseEntity<ApiResponse<Set<Blueprint>>> response = controller.getAll();
+            ResponseEntity<ApiResponse<Set<BlueprintDTO>>> response = controller.getAll();
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -74,6 +85,7 @@ class BlueprintsAPIControllerTest {
             assertThat(response.getBody().code()).isEqualTo(200);
             assertThat(response.getBody().message()).isEqualTo("Success");
             assertThat(response.getBody().data()).hasSize(1);
+            assertThat(response.getBody().data().iterator().next().getName()).isEqualTo("blueprint1");
 
             verify(services, times(1)).getAllBlueprints();
         }
@@ -85,7 +97,7 @@ class BlueprintsAPIControllerTest {
             when(services.getAllBlueprints()).thenReturn(new HashSet<>());
 
             // Act
-            ResponseEntity<ApiResponse<Set<Blueprint>>> response = controller.getAll();
+            ResponseEntity<ApiResponse<Set<BlueprintDTO>>> response = controller.getAll();
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -108,13 +120,14 @@ class BlueprintsAPIControllerTest {
             when(services.getBlueprintsByAuthor(author)).thenReturn(sampleBlueprintSet);
 
             // Act
-            ResponseEntity<ApiResponse<Set<Blueprint>>> response = controller.byAuthor(author);
+            ResponseEntity<ApiResponse<Set<BlueprintDTO>>> response = controller.byAuthor(author);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().code()).isEqualTo(200);
             assertThat(response.getBody().data()).hasSize(1);
+            assertThat(response.getBody().data().iterator().next().getAuthor()).isEqualTo(author);
 
             verify(services, times(1)).getBlueprintsByAuthor(author);
         }
@@ -128,7 +141,7 @@ class BlueprintsAPIControllerTest {
                 .thenThrow(new BlueprintNotFoundException("No se encontraron blueprints para el autor"));
 
             // Act
-            ResponseEntity<ApiResponse<Set<Blueprint>>> response = controller.byAuthor(author);
+            ResponseEntity<ApiResponse<Set<BlueprintDTO>>> response = controller.byAuthor(author);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -153,13 +166,13 @@ class BlueprintsAPIControllerTest {
             when(services.getBlueprint(author, bpname)).thenReturn(sampleBlueprint);
 
             // Act
-            ResponseEntity<ApiResponse<Blueprint>> response = controller.byAuthorAndName(author, bpname);
+            ResponseEntity<ApiResponse<BlueprintDTO>> response = controller.byAuthorAndName(author, bpname);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().code()).isEqualTo(200);
-            assertThat(response.getBody().data()).isEqualTo(sampleBlueprint);
+            assertThat(response.getBody().data().getName()).isEqualTo(bpname);
             assertThat(response.getBody().data().getPoints()).hasSize(2);
 
             verify(services, times(1)).getBlueprint(author, bpname);
@@ -175,7 +188,7 @@ class BlueprintsAPIControllerTest {
                 .thenThrow(new BlueprintNotFoundException("Blueprint no encontrado"));
 
             // Act
-            ResponseEntity<ApiResponse<Blueprint>> response = controller.byAuthorAndName(author, bpname);
+            ResponseEntity<ApiResponse<BlueprintDTO>> response = controller.byAuthorAndName(author, bpname);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -196,9 +209,9 @@ class BlueprintsAPIControllerTest {
         void shouldCreateBlueprintSuccessfully() throws BlueprintPersistenceException {
             // Arrange
             var request = new BlueprintsAPIController.NewBlueprintRequest(
-                "author1", 
-                "newBlueprint", 
-                Arrays.asList(new Point(1, 1), new Point(2, 2))
+                "author1",
+                "newBlueprint",
+                Arrays.asList(new PointDTO(1, 1), new PointDTO(2, 2))
             );
             
             doNothing().when(services).addNewBlueprint(any(Blueprint.class));
@@ -220,9 +233,9 @@ class BlueprintsAPIControllerTest {
         void shouldReturn400WhenBlueprintExists() throws BlueprintPersistenceException {
             // Arrange
             var request = new BlueprintsAPIController.NewBlueprintRequest(
-                "author1", 
-                "existingBlueprint", 
-                Arrays.asList(new Point(1, 1))
+                "author1",
+                "existingBlueprint",
+                Arrays.asList(new PointDTO(1, 1))
             );
             
             doThrow(new BlueprintPersistenceException("El blueprint ya existe"))
@@ -251,9 +264,9 @@ class BlueprintsAPIControllerTest {
             // Arrange
             String author = "author1";
             String bpname = "blueprint1";
-            Point point = new Point(50, 60);
+            PointDTO point = new PointDTO(50, 60);
             
-            doNothing().when(services).addPoint(author, bpname, point.x(), point.y());
+            doNothing().when(services).addPoint(author, bpname, point.getX(), point.getY());
 
             // Act
             ResponseEntity<ApiResponse<Void>> response = controller.addPoint(author, bpname, point);
@@ -264,7 +277,7 @@ class BlueprintsAPIControllerTest {
             assertThat(response.getBody().code()).isEqualTo(201);
             assertThat(response.getBody().message()).isEqualTo("Created");
 
-            verify(services, times(1)).addPoint(author, bpname, point.x(), point.y());
+            verify(services, times(1)).addPoint(author, bpname, point.getX(), point.getY());
         }
 
         @Test
@@ -273,10 +286,10 @@ class BlueprintsAPIControllerTest {
             // Arrange
             String author = "author1";
             String bpname = "nonexistent";
-            Point point = new Point(50, 60);
+            PointDTO point = new PointDTO(50, 60);
             
             doThrow(new BlueprintNotFoundException("Blueprint no encontrado"))
-                .when(services).addPoint(author, bpname, point.x(), point.y());
+                .when(services).addPoint(author, bpname, point.getX(), point.getY());
 
             // Act
             ResponseEntity<ApiResponse<Void>> response = controller.addPoint(author, bpname, point);
@@ -287,7 +300,7 @@ class BlueprintsAPIControllerTest {
             assertThat(response.getBody().code()).isEqualTo(404);
             assertThat(response.getBody().message()).contains("no encontrado");
 
-            verify(services, times(1)).addPoint(author, bpname, point.x(), point.y());
+            verify(services, times(1)).addPoint(author, bpname, point.getX(), point.getY());
         }
     }
 }
