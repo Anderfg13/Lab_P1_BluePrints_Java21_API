@@ -5,6 +5,8 @@ import edu.eci.arsw.blueprints.model.Blueprint;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistence;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
+import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -41,6 +43,7 @@ public class BlueprintsServices {
      * @param bp The blueprint to add
      * @throws BlueprintPersistenceException if a blueprint with the same key already exists
      */
+    @Transactional
     public void addNewBlueprint(Blueprint bp) throws BlueprintPersistenceException {
         persistence.saveBlueprint(bp);
     }
@@ -82,6 +85,7 @@ public class BlueprintsServices {
      * @param y The y-coordinate of the new point
      * @throws BlueprintNotFoundException if the blueprint is not found
      */
+    @Transactional
     public void addPoint(String author, String name, int x, int y) throws BlueprintNotFoundException {
         persistence.addPoint(author, name, x, y);
     }

@@ -200,8 +200,8 @@ public class BlueprintsAPIController {
                                       @RequestBody Point p) {
         try {
             services.addPoint(author, bpname, p.x(), p.y());
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(new ApiResponse<>(202, "Accepted", null)); // 202 Accepted
+            return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(201, "Created", null)); // 201 Created
         } catch (BlueprintNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>(404, e.getMessage(), null)); // 404 Not Found
