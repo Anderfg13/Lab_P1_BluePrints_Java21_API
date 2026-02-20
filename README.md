@@ -7,6 +7,14 @@
 - Java 21
 - Maven 3.9+
 
+## Integrantes
+- Anderson Fabian Garcia Nieto  
+- Juana Lozano Chaves
+
+## Link del informe de laboratorio
+
+- Link: https://docs.google.com/document/d/1hokZ0NKmrk-SieZNwBOXzKU8qL_QwcyreaFpDZeBnBk/edit?usp=sharing
+
 ## ▶️ Ejecución del proyecto
 ```bash
 mvn clean install
@@ -110,12 +118,75 @@ src/main/java/edu/eci/arsw/blueprints
 
 ## 📊 Criterios de evaluación
 
+## 🗂️ Estructura de carpetas (actualizada)
+
+```
+src/main/java/edu/eci/arsw/blueprints
+  ├── model/         # Entidades de dominio: Blueprint, Point
+  ├── persistence/   # Interfaz y repositorios (InMemory, Postgres)
+  ├── services/      # Lógica de negocio y orquestación
+  ├── filters/       # Filtros de procesamiento (Identity, Redundancy, Undersampling)
+  ├── controllers/   # REST Controllers (BlueprintsAPIController)
+  ├── dto/           # Data Transfer Objects y mapeadores
+  └── config/        # Configuración (Swagger/OpenAPI, etc.)
+src/main/resources
+  ├── application.properties  # Configuración principal
+  └── application.yml        # Configuración alternativa
+src/test/java/edu/eci/arsw/blueprints
+  ├── BlueprintsAPIControllerTest.java
+  ├── BlueprintsFilterTest.java
+  ├── BlueprintsServicesTest.java
+  └── BlueprintsSmokeTest.java
+Dockerfile                    # Build personalizado para contenedor
+pom.xml                       # Dependencias y plugins Maven
+```
 | Criterio | Peso |
 |----------|------|
+Con Actuator habilitado, puedes acceder a:
+
+- [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health) — Estado de la aplicación
+- [http://localhost:8080/actuator/info](http://localhost:8080/actuator/info) — Información general
+- [http://localhost:8080/actuator/metrics](http://localhost:8080/actuator/metrics) — Métricas generales
+- [http://localhost:8080/actuator](http://localhost:8080/actuator) — Lista de todos los endpoints disponibles
 | Diseño de API (versionamiento, DTOs, ApiResponse) | 25% |
 | Migración a PostgreSQL (repositorio y persistencia correcta) | 25% |
+El proyecto requiere una base de datos PostgreSQL corriendo en `localhost:5432` con:
+
+- Base de datos: `mi_basedatos`
+- Usuario: `admin`
+- Contraseña: `admin123`
+
+Puedes levantar una instancia local rápidamente con Docker:
+
+```bash
+docker run --name blueprints-postgres -e POSTGRES_DB=mi_basedatos -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin123 -p 5432:5432 -d postgres:16
+```
+
+La configuración puede ser modificada en `src/main/resources/application.properties` o `application.yml`.
 | Uso correcto de códigos HTTP y control de errores | 20% |
 | Documentación con OpenAPI/Swagger + README | 15% |
+Puedes construir la imagen usando Spring Boot Buildpacks o el Dockerfile:
+
+**Opción 1: Buildpacks (recomendado)**
+
+```bash
+mvn spring-boot:build-image
+```
+Esto generará una imagen llamada `blueprints-api:latest`.
+
+**Opción 2: Dockerfile clásico**
+
+```bash
+docker build -t blueprints-api:latest .
+```
+
+Para ejecutar el contenedor:
+
+```bash
+docker run -p 8080:8080 --name blueprints-api --link blueprints-postgres:postgres -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mi_basedatos -e SPRING_DATASOURCE_USERNAME=admin -e SPRING_DATASOURCE_PASSWORD=admin123 blueprints-api:latest
+```
+
+> Si usas Docker Compose, asegúrate de definir ambos servicios (app y postgres) y las variables de entorno.
 | Pruebas básicas (unitarias o de integración) | 15% |
 
 **Bonus**:  
