@@ -55,8 +55,12 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Spring Boot Actuator for metrics and monitoring -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -75,7 +79,17 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <imageName>blueprints-api:latest</imageName>
+        </configuration>
       </plugin>
     </plugins>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>blueprints</id>
+      <name>Blueprints</name>
+      <url>file:///home/runner/work/ARSW-Lab-4/ARSW-Lab-4/blueprints-api</url>
+    </repository>
+  </distributionManagement>
 </project>
