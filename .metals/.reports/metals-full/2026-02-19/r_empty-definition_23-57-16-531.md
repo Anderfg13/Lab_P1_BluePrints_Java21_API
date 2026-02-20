@@ -1,8 +1,19 @@
+error id: file:///D:/ander/Documents/SEMESTRE%207/ARSW/LAB04%20-%20P1%20-%20BLUEPRINTS/Lab_P1_BluePrints_Java21_API/src/main/java/edu/eci/arsw/blueprints/controllers/BlueprintsAPIController.java:edu/eci/arsw/blueprints/dto/BlueprintDTO#
+file:///D:/ander/Documents/SEMESTRE%207/ARSW/LAB04%20-%20P1%20-%20BLUEPRINTS/Lab_P1_BluePrints_Java21_API/src/main/java/edu/eci/arsw/blueprints/controllers/BlueprintsAPIController.java
+empty definition using pc, found symbol in pc: edu/eci/arsw/blueprints/dto/BlueprintDTO#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 177
+uri: file:///D:/ander/Documents/SEMESTRE%207/ARSW/LAB04%20-%20P1%20-%20BLUEPRINTS/Lab_P1_BluePrints_Java21_API/src/main/java/edu/eci/arsw/blueprints/controllers/BlueprintsAPIController.java
+text:
+```scala
 package edu.eci.arsw.blueprints.controllers;
 
 import edu.eci.arsw.blueprints.model.Blueprint;
 import edu.eci.arsw.blueprints.model.Point;
-import edu.eci.arsw.blueprints.dto.BlueprintDTO;
+import edu.eci.arsw.blueprints.dto.@@BlueprintDTO;
 import edu.eci.arsw.blueprints.dto.PointDTO;
 import edu.eci.arsw.blueprints.dto.BlueprintMapper;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
@@ -226,3 +237,10 @@ public class BlueprintsAPIController {
             @Valid java.util.List<PointDTO> points
         ) { }
 }
+
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: edu/eci/arsw/blueprints/dto/BlueprintDTO#
