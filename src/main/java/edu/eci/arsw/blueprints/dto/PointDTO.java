@@ -7,8 +7,16 @@ public class PointDTO {
     private int x;
     private int y;
 
+    /**
+     * Constructor vacío requerido para serialización/deserialización.
+     */
     public PointDTO() {}
 
+    /**
+     * Constructor para inicializar las coordenadas del punto.
+     * @param x coordenada X
+     * @param y coordenada Y
+     */
     public PointDTO(int x, int y) {
         this.x = x;
         this.y = y;
